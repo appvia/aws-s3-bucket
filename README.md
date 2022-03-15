@@ -26,7 +26,7 @@ helm install [RELEASE_NAME] appvia-community/aws-s3-bucket \
   --create-namespace \
   --set aws.region=[AWS_REGION] \
   --set aws.credentials=[AWS_CREDENTIALS] \
-  --set --set s3.bucket=[S3_BUCKET]
+  --set s3.bucket=[S3_BUCKET]
 ```
 
 ## Upgrade Chart
