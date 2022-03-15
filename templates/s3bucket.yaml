@@ -1,0 +1,46 @@
+apiVersion: tf.isaaguilar.com/v1alpha1
+kind: Terraform
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    {{- include "aws-s3-bucket.labels" . | nindent 4 }}
+spec:
+  terraformVersion: {{ .Values.terraform.version }}
+  terraformRunnerPullPolicy: IfNotPresent
+  terraformModule: {{ .Values.terraform.module }}?ref={{ .Values.terraform.moduleVersion }}
+  resourceDownloads:
+  - address: https://github.com/appvia/terraform-providers.git//aws/aws.tf?ref=main
+  ignoreDelete: false
+  {{- with .Values.aws.credentials }}
+  credentials:
+    {{- toYaml . | nindent 2 }}
+  {{- end }}
+  env:
+  - name: TF_VAR_region
+    value: {{ required "You must specify an AWS region!" .Values.aws.region }}
+  - name: TF_VAR_bucket
+    value: {{ required "You must specify a unique bucket name!" .Values.s3.bucket }}
+  - name: TF_VAR_acl
+    value: {{ .Values.s3.acl }}
+  - name: TF_VAR_versioning
+    value: {{ .Values.s3.versioning | toJson | quote }}
+  - name: TF_VAR_block_public_acls
+    value: "{{ .Values.s3.block_public_acls }}"
+  - name: TF_VAR_block_public_policy
+    value: "{{ .Values.s3.block_public_policy }}"
+  - name: TF_VAR_ignore_public_acls
+    value: "{{ .Values.s3.ignore_public_acls }}"
+  - name: TF_VAR_restrict_public_buckets
+    value: "{{ .Values.s3.restrict_public_buckets }}"
+  - name: TF_VAR_server_side_encryption_configuration
+    value: {{ .Values.s3.server_side_encryption_configuration | toJson | quote }}
+
+  outputsSecret: "{{ .Chart.Name }}-outputs"
+  customBackend: |-
+    terraform {
+      backend "kubernetes" {
+        secret_suffix    = "{{ .Chart.Name }}"
+        in_cluster_config  = true
+        namespace = "{{ .Release.Namespace }}"
+      }
+    }

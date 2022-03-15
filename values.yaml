@@ -1,0 +1,40 @@
+# Default values for aws-s3-bucket.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+terraform:
+  # -- The version of Terraform used
+  version: 1.1.4
+  # -- The HashiCorp official Terraform module
+  module: https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git
+  # -- The version of the Terraform module used to create an S3 bucket
+  moduleVersion: v2.14.1
+
+aws:
+  # -- The AWS region where the S3 bucket should be created
+  region: ""
+  # --  The AWS credentials to be used for provisioning the S3 bucket
+  credentials: {}
+
+s3:
+    # -- The name of the bucket. If omitted, Terraform will assign a random, unique name
+    bucket: ""
+    # -- The canned ACL to apply
+    acl: private
+    # -- Map containing versioning configuration
+    versioning:
+      enabled: true
+    # --Whether Amazon S3 should block public ACLs for this bucket
+    block_public_acls: true
+    # -- Whether Amazon S3 should block public bucket policies for this bucket
+    block_public_policy: true
+    # -- Whether Amazon S3 should ignore public ACLs for this bucket
+    ignore_public_acls: true
+    # -- Whether Amazon S3 should restrict public bucket policies for this bucket
+    restrict_public_buckets: true
+    # -- Map containing server-side encryption configuration
+    server_side_encryption_configuration:
+      rule:
+        apply_server_side_encryption_by_default:
+          sse_algorithm: "aws:kms"
+        bucket_key_enabled: true
